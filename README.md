@@ -1,83 +1,116 @@
 # MyFirstCloud
 
-Ett pedagogiskt iOS-startprojekt för att koppla **SwiftUI** till **Cloud Firestore** via Firebase. Du har redan jobbat med `@State`, `List` och navigation — här får du för första gången prova **async/await**, **nätverksanrop** och **Firebase**.
+**SwiftUI · Cloud Firestore · Firebase**
+
+Pedagogiskt startprojekt: du kopplar en enkel anteckningslista till molnet. Förkunskaper: `@State`, `List` och navigation. Här introduceras **async/await**, **nätverksanrop** och **Firebase** stegvis.
 
 ---
 
-## Inlämningsuppgift (kort)
+## Innehåll
 
-1. Följ guiden nedan **steg för steg** (Firebase-projekt, iOS-app, SDK, Firestore-regler).
-2. Öppna `FirebaseManager.swift` och **fyll i alla TODO-rader** enligt kommentarerna (koppla ihop databasen, hämta och spara anteckningar).
-3. **Kör appen** i simulator eller på fysisk enhet och kontrollera att du kan spara text och se den i listan.
-4. I Firestore (eller via appen om du sparar namnet som text): **lägg till ditt namn** i databasen så att läraren ser att det är ditt konto (t.ex. ett dokument i `notes` med texten `Namn: …` — följ ev. instruktion från lärare).
-5. **Pusha** ditt repo till **GitHub** och lämna in enligt kursens rutin.
-
-> **Säkerhet:** I labben används Firestore *Test Mode* (öppen databas under begränsad tid). Det är **endast för utbildning**. I en riktig app måste du ha autentisering och strikta säkerhetsregler.
-
----
-
-## A) Skapa ett projekt i Firebase Console
-
-1. Gå till [https://console.firebase.google.com/](https://console.firebase.google.com/) och logga in med ditt Google-konto.
-2. Klicka **Add project** / **Lägg till projekt**.
-3. **Projektnamn:** välj valfritt namn (t.ex. `MyFirstCloud-DittNamn`).
-4. **Google Analytics:** du kan stänga av Analytics för det här labbet om du vill hålla det enkelt — det behövs inte för Firestore-grunderna. Om du slår på det får du välja eller skapa ett Analytics-konto.
-5. Klicka **Create project** / **Skapa projekt** och vänta tills Firebase är klart.
-6. Du landar på projektets **översiktssida (Project Overview)**.
+1. **Inlämningsuppgift** — vad du ska leverera  
+2. **Del A** — Firebase-projekt i konsolen  
+3. **Del B** — iOS-app och `GoogleService-Info.plist`  
+4. **Del C** — Firebase SDK via Swift Package Manager  
+5. **Del D** — Cloud Firestore och Test Mode  
+6. **Kod att fylla i** — TODO i `FirebaseManager.swift`  
+7. **Felsökning** — vanliga problem  
+8. **Git och GitHub** — version och inlämning  
 
 ---
 
-## B) Lägga till en iOS-app och ladda ner `GoogleService-Info.plist`
+## Inlämningsuppgift
 
-1. I Firebase-konsolen, leta efter ikonen **iOS+** (eller **Add app** / **Lägg till app**) på projektets startsida.
-2. Välj **iOS**.
-3. **Apple bundle ID:** måste **exakt** matcha det som står i Xcode för din app.
-   - Öppna Xcode → välj projektet **MyFirstCloud** → target **MyFirstCloud** → fliken **General**.
-   - Kopiera värdet under **Bundle Identifier** (t.ex. `com.dittnamn.MyFirstCloud`).
-   - Klistra in samma värde i Firebase när du registrerar iOS-appen.
-4. **App nickname** och **App Store ID** kan du lämna tomma för labben.
-5. Klicka **Register app** / **Registrera app**.
-6. På nästa steg: ladda ner filen **`GoogleService-Info.plist`** till din dator.
-7. I **Finder**: dra `GoogleService-Info.plist` in i Xcode-projektet **MyFirstCloud** (samma grupp som `ContentView.swift`).
-   - Kryssa i **Copy items if needed**.
-   - Kryssa i att filen ska ingå i target **MyFirstCloud**.
-8. Fortsätt guiden i Firebase (du kan hoppa över stegen om CocoaPods om du följer SPM nedan) och klicka **Continue** tills du är klar.
+Gör i denna ordning:
 
-**Kontroll:** I Xcode ska du se `GoogleService-Info.plist` i projektnavigatorn. Utan den här filen startar inte Firebase korrekt i appen.
+1. **Konfigurera Firebase** enligt avsnitten A–D nedan (projekt, iOS-app, `GoogleService-Info.plist`, SDK, Firestore, regler).
+2. **Implementera** alla TODO-rader i `FirebaseManager.swift` så att anteckningar hämtas och sparas mot kollektionen `notes`.
+3. **Verifiera** att appen kör i simulator eller på enhet: du ska kunna skriva text, spara och se den i listan.
+4. **Registrera ditt namn** i databasen så att läraren kan koppla inlämningen till dig (t.ex. ett dokument i `notes` med text som `Namn: Förnamn Efternamn`, om inget annat anges i kursen).
+5. **Publicera koden** genom att pusha till **GitHub** och lämna in enligt kursens rutin.
+
+> **Testläge är tillfälligt öppet**  
+> Firestore *Test Mode* tillåter läs/skriv utan inloggning under en begränsad tid. Använd **endast i utbildning**. I produktion krävs autentisering och strikta säkerhetsregler.
 
 ---
 
-## C) Lägga till Firebase SDK via Swift Package Manager (SPM) i Xcode
+## Del A — Firebase-projekt
 
-Det här projektet kan redan ha Firebase kopplat via SPM. Om du klonar en ren kopia eller skapar projekt själv, gör så här:
+**Mål:** Ett tomt Firebase-projekt som du sedan kopplar till din iOS-app.
 
-1. Öppna `MyFirstCloud.xcodeproj` i Xcode.
-2. Välj **File → Add Package Dependencies…** (eller **Add Packages…** beroende på Xcode-version).
-3. I fältet för URL, klistra in:  
-   `https://github.com/firebase/firebase-ios-sdk`
-4. Välj **Dependency Rule:** t.ex. **Up to Next Major Version** med en lämplig lägsta version (t.ex. `11.0.0` eller nyare).
-5. Klicka **Add Package**.
-6. I produktlistan, markera minst:
-   - **FirebaseCore**
-   - **FirebaseFirestore**
-7. Lägg till dem till target **MyFirstCloud** och bekräfta.
+| Steg | Gör så här |
+|------|------------|
+| 1 | Öppna [Firebase Console](https://console.firebase.google.com/) och logga in. |
+| 2 | Välj **Add project** / **Lägg till projekt**. |
+| 3 | Ange ett **projektnamn** (t.ex. `MyFirstCloud-DittNamn`). |
+| 4 | **Google Analytics** kan du stänga av för detta labb om du vill förenkla; det krävs inte för Firestore-grunderna. |
+| 5 | Bekräfta med **Create project** / **Skapa projekt** och vänta tills guiden är klar. |
 
-**Kontroll:** Projektet ska bygga utan att `import FirebaseCore` / `import FirebaseFirestore` ger fel.
+**Kontroll:** Du ser projektets översikt (**Project Overview**).
 
 ---
 
-## D) Aktivera Cloud Firestore och sätta regler till Test Mode
+## Del B — iOS-app och `GoogleService-Info.plist`
 
-1. I [Firebase Console](https://console.firebase.google.com/), välj ditt projekt.
-2. I vänstermenyn: **Build** → **Firestore Database** (eller **Firestore**).
-3. Klicka **Create database** / **Skapa databas**.
-4. Välj **Start in test mode** / **Starta i testläge** (för labben).
-5. Välj en **Cloud Firestore location** (välj en region nära dig om du får frågan). Vissa val går **inte** att ändra senare.
-6. När databasen är skapad: gå till fliken **Rules** / **Regler**.
+**Mål:** Registrera appen i Firebase och lägga konfigurationsfilen i Xcode.
 
-Du ska se regler i stil med (exakt formulering kan variera något):
+### Registrera iOS-appen
 
-```
+| Steg | Gör så här |
+|------|------------|
+| 1 | På projektets startsida: **Add app** eller ikonen **iOS+**. |
+| 2 | Välj plattform **iOS**. |
+| 3 | **Bundle ID** måste vara **identisk** med Xcode: projekt **MyFirstCloud** → target **MyFirstCloud** → **General** → kopiera **Bundle Identifier** (t.ex. `com.dittnamn.MyFirstCloud`) och klistra in i Firebase. |
+| 4 | **App nickname** och **App Store ID** kan lämnas tomma. |
+| 5 | Välj **Register app** / **Registrera app**. |
+
+### Lägg till konfigurationsfilen
+
+| Steg | Gör så här |
+|------|------------|
+| 1 | Ladda ner **`GoogleService-Info.plist`** från guiden. |
+| 2 | I Finder: dra filen in i Xcode-gruppen **MyFirstCloud** (bredvid `ContentView.swift`). |
+| 3 | Kryssa i **Copy items if needed** och att filen ingår i target **MyFirstCloud**. |
+| 4 | Gå igenom resten av Firebase-guiden (CocoaPods-steg kan du hoppa över om du använder SPM i avsnitt C). |
+
+**Kontroll:** `GoogleService-Info.plist` syns i projektnavigatorn och är kopplad till target. Utan den filen kan Firebase inte starta korrekt.
+
+---
+
+## Del C — Firebase SDK (Swift Package Manager)
+
+**Mål:** Länka **FirebaseCore** och **FirebaseFirestore** till appen.
+
+Detta repo kan redan ha paketen ifyllda. Om du sätter upp projektet från scratch:
+
+| Steg | Gör så här |
+|------|------------|
+| 1 | Öppna `MyFirstCloud.xcodeproj`. |
+| 2 | **File** → **Add Package Dependencies…** (eller **Add Packages…**). |
+| 3 | Klistra in URL: `https://github.com/firebase/firebase-ios-sdk` |
+| 4 | Regel: t.ex. **Up to Next Major Version**, lägsta `11.0.0` eller nyare. |
+| 5 | Välj **Add Package**. |
+| 6 | Markera produkterna **FirebaseCore** och **FirebaseFirestore** och lägg dem till target **MyFirstCloud**. |
+
+**Kontroll:** Projektet bygger och `import FirebaseCore` / `import FirebaseFirestore` ger inga fel.
+
+---
+
+## Del D — Cloud Firestore och Test Mode
+
+**Mål:** En Firestore-databas med öppna regler under labben.
+
+| Steg | Gör så här |
+|------|------------|
+| 1 | I Firebase Console: **Build** → **Firestore Database**. |
+| 2 | **Create database** / **Skapa databas**. |
+| 3 | Välj **Start in test mode** / **Starta i testläge**. |
+| 4 | Välj **region** (nära dig); vissa val går inte att ändra senare. |
+| 5 | Öppna fliken **Rules** / **Regler** och kontrollera att du har testläges-regler med ett utgångsdatum. |
+
+Exempel på hur reglerna kan se ut (exakt datum och formulering kan skilja sig):
+
+```text
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -88,41 +121,42 @@ service cloud.firestore {
 }
 ```
 
-Det betyder ungefär: **vem som helst kan läsa och skriva** tills ett **slutdatum** — därför är det bara för **utbildning** och **inte** för riktiga användardata.
+**Vad det innebär:** alla kan läsa och skriva tills datumet passerats. Använd bara för övning.
 
-**Appens kollektion:** koden förväntar sig en kollektion som heter **`notes`**. Varje dokument kan ha fältet **`text`** (sträng). När du fyllt i `fetchNotes` och `saveNote` skapas dokument automatiskt när du sparar från appen.
-
----
-
-## Kod du ska fylla i (TODO)
-
-Öppna `FirebaseManager.swift`:
-
-1. **TODO 1:** `let db = Firestore.firestore()`
-2. **TODO 2:** `let snapshot = try? await db.collection("notes").getDocuments()`
-3. Efter steg 2 måste du **bygga en `[CloudNote]`** från `snapshot` (t.ex. loopa `snapshot.documents` och använda `data(as: CloudNote.self)`).
-4. I **`saveNote`:** innan raden som sparar med `db.collection("notes")…` måste du ha samma **`let db = Firestore.firestore()`** som i steg 1 (annars finns ingen `db`).
-5. **TODO 3:** `try? await db.collection("notes").addDocument(data: ["text": text])`
-
-Kör appen igen efter varje ändring och använd **Firestore → Data** i konsolen för att se att dokument dyker upp.
+**Data i appen:** koden använder kollektionen **`notes`**. Dokument ska kunna avkodas till fältet **`text`** (sträng). När `fetchNotes` och `saveNote` är implementerade skapas och läses dokument automatiskt.
 
 ---
 
-## Felsökning (kort)
+## Kod att fylla i
 
-| Problem | Vad du kan prova |
-|--------|-------------------|
-| Build-fel på `import Firebase…` | Kontrollera att SPM-paketet är tillagt och att **FirebaseCore** + **FirebaseFirestore** är länkade till target. |
-| Krasch vid start | Finns `GoogleService-Info.plist` i projektet och i rätt target? Stämmer **Bundle ID** mot Firebase? |
-| Tom lista / inget sparas | Har du implementerat **både** hämtning och sparning? Stämmer kollektionsnamnet `notes`? |
-| Permission denied i konsolen | Regler i Test Mode? Är datumet i reglerna inte redan passerat? |
+Öppna **`FirebaseManager.swift`** och slutför logiken:
+
+| TODO | Uppgift |
+|------|---------|
+| **1** | `let db = Firestore.firestore()` |
+| **2** | `let snapshot = try? await db.collection("notes").getDocuments()` |
+| Efter 2 | Bygg returvärdet `[CloudNote]` från `snapshot` (t.ex. gå igenom `snapshot.documents` och använd `data(as: CloudNote.self)`). |
+| **3** (i `saveNote`) | Innan du anropar `db` måste `db` finnas (samma som i TODO 1). Sedan: `try? await db.collection("notes").addDocument(data: ["text": text])` |
+
+**Tips:** Efter ändringar, kör appen och öppna **Firestore → Data** i konsolen för att se att dokument dyker upp.
 
 ---
 
-## Repo och GitHub
+## Felsökning
 
-1. Initiera git i projektmappen om du inte redan gjort det: `git init`
-2. Lägg till `.gitignore` om kursen rekommenderar det (t.ex. ignorera `xcuserdata/`, byggartefakter).
-3. **Obs:** många väljer **inte** att committa `GoogleService-Info.plist` till ett publikt repo eftersom den innehåller projektnycklar. Följ **lärarens** anvisning — vissa kurser vill att du committar den för enkel rättning, andra vill att du använder hemliga variabler eller delar filen separat.
+| Symtom | Åtgärd |
+|--------|--------|
+| Fel vid `import Firebase…` | Kontrollera att SPM-paketet är tillagt och att **FirebaseCore** och **FirebaseFirestore** är kopplade till rätt target. |
+| Krasch vid start | Finns `GoogleService-Info.plist` i projektet och i target? Stämmer **Bundle ID** med Firebase? |
+| Listan är tom / inget sparas | Är både hämtning och sparning implementerade? Heter kollektionen `notes`? |
+| *Permission denied* i logg eller konsol | Är reglerna fortfarande i testläge? Har utgångsdatumet i reglerna passerats? |
 
-Lycka till med din första moln-app.
+---
+
+## Git och GitHub
+
+1. Initiera repo lokalt om det saknas: `git init`
+2. Använd kursens **`.gitignore`** (t.ex. `xcuserdata/`, byggmappar) om det rekommenderas.
+3. **`GoogleService-Info.plist`:** innehåller projektidentifierare. Vissa kurser vill att du committar filen för enkel rättning; andra förbjuder det i publika repo. **Följ lärarens beslut.**
+
+Lycka till.
