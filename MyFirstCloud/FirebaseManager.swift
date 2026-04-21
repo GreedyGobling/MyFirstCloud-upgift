@@ -8,7 +8,7 @@ import FirebaseFirestore
 /// Hanterar alla anrop mot Firestore. Fyll i enligt README (async/await).
 final class FirebaseManager {
     private let db = Firestore.firestore()
-    
+
     // TODO: Lägg till en `private let db`-property som pekar på Firestore.
     // Rekommendation: `private let db = Firestore.firestore()` — se README ("Var ska db ligga?").
 
@@ -24,14 +24,14 @@ final class FirebaseManager {
         } catch {
             print("Failed to fetch notes: \(error)")
             return []
+        }
     }
-}
 
     /// Sparar en ny anteckning som ett nytt dokument i kollektionen `notes`.
     func saveNote(text: String) async {
         do {
             try await db.collection("notes").addDocument(data: [
-                "Text": text
+                "text": text
             ])
         } catch {
             print("Failed to save note: \(error)")
